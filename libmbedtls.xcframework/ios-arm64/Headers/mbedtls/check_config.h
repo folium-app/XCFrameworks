@@ -171,10 +171,10 @@
 #endif
 
 #if defined(MBEDTLS_PK_C) && defined(MBEDTLS_USE_PSA_CRYPTO)
-#if defined(MBEDTLS_PK_CAN_ECDSA_SIGN) && !defined(MBEDTLS_ASN1_WRITE_C)
+#if defined(PSA_HAVE_ALG_ECDSA_SIGN) && !defined(MBEDTLS_ASN1_WRITE_C)
 #error "MBEDTLS_PK_C with MBEDTLS_USE_PSA_CRYPTO needs MBEDTLS_ASN1_WRITE_C for ECDSA signature"
 #endif
-#if defined(MBEDTLS_PK_CAN_ECDSA_VERIFY) && !defined(MBEDTLS_ASN1_PARSE_C)
+#if defined(PSA_HAVE_ALG_ECDSA_VERIFY) && !defined(MBEDTLS_ASN1_PARSE_C)
 #error "MBEDTLS_PK_C with MBEDTLS_USE_PSA_CRYPTO needs MBEDTLS_ASN1_PARSE_C for ECDSA verification"
 #endif
 #endif /* MBEDTLS_PK_C && MBEDTLS_USE_PSA_CRYPTO */
@@ -182,17 +182,6 @@
 #if defined(MBEDTLS_ECJPAKE_C) && \
     !defined(MBEDTLS_ECP_C)
 #error "MBEDTLS_ECJPAKE_C defined, but not all prerequisites"
-#endif
-
-#if defined(MBEDTLS_ECP_RESTARTABLE)           && \
-    ( defined(MBEDTLS_ECDH_COMPUTE_SHARED_ALT) || \
-      defined(MBEDTLS_ECDH_GEN_PUBLIC_ALT)     || \
-      defined(MBEDTLS_ECDSA_SIGN_ALT)          || \
-      defined(MBEDTLS_ECDSA_VERIFY_ALT)        || \
-      defined(MBEDTLS_ECDSA_GENKEY_ALT)        || \
-      defined(MBEDTLS_ECP_INTERNAL_ALT)        || \
-      defined(MBEDTLS_ECP_ALT) )
-#error "MBEDTLS_ECP_RESTARTABLE defined, but it cannot coexist with an alternative ECP implementation"
 #endif
 
 #if defined(MBEDTLS_ECP_RESTARTABLE)           && \
@@ -222,7 +211,7 @@
 #endif
 
 #if defined(MBEDTLS_ENTROPY_C) && \
-    !(defined(MBEDTLS_MD_CAN_SHA512) || defined(MBEDTLS_MD_CAN_SHA256))
+    !(defined(PSA_WANT_ALG_SHA_512) || defined(PSA_WANT_ALG_SHA_256))
 #error "MBEDTLS_ENTROPY_C defined, but not all prerequisites"
 #endif
 #if defined(MBEDTLS_ENTROPY_C) && \
@@ -230,12 +219,12 @@
 #error "MBEDTLS_CTR_DRBG_ENTROPY_LEN value too high"
 #endif
 #if defined(MBEDTLS_ENTROPY_C) &&                                            \
-    (defined(MBEDTLS_ENTROPY_FORCE_SHA256) || !defined(MBEDTLS_MD_CAN_SHA512)) \
+    (defined(MBEDTLS_ENTROPY_FORCE_SHA256) || !defined(PSA_WANT_ALG_SHA_512)) \
     && defined(MBEDTLS_CTR_DRBG_ENTROPY_LEN) && (MBEDTLS_CTR_DRBG_ENTROPY_LEN > 32)
 #error "MBEDTLS_CTR_DRBG_ENTROPY_LEN value too high"
 #endif
 #if defined(MBEDTLS_ENTROPY_C) && \
-    defined(MBEDTLS_ENTROPY_FORCE_SHA256) && !defined(MBEDTLS_MD_CAN_SHA256)
+    defined(MBEDTLS_ENTROPY_FORCE_SHA256) && !defined(PSA_WANT_ALG_SHA_256)
 #error "MBEDTLS_ENTROPY_FORCE_SHA256 defined, but not all prerequisites"
 #endif
 
@@ -246,6 +235,9 @@
 #endif
 #if defined(MBEDTLS_TEST_CONSTANT_FLOW_MEMSAN) &&  !defined(MBEDTLS_HAS_MEMSAN)
 #error "MBEDTLS_TEST_CONSTANT_FLOW_MEMSAN requires building with MemorySanitizer"
+#endif
+#if defined(MBEDTLS_HAS_MEMSAN) && defined(MBEDTLS_HAVE_ASM)
+#error "MemorySanitizer does not support assembly implementation"
 #endif
 #undef MBEDTLS_HAS_MEMSAN // temporary macro defined above
 
@@ -269,42 +261,6 @@
 #error "MBEDTLS_CHACHAPOLY_C defined, but not all prerequisites"
 #endif
 
-#if defined(MBEDTLS_ECP_RANDOMIZE_JAC_ALT) && !defined(MBEDTLS_ECP_INTERNAL_ALT)
-#error "MBEDTLS_ECP_RANDOMIZE_JAC_ALT defined, but not all prerequisites"
-#endif
-
-#if defined(MBEDTLS_ECP_ADD_MIXED_ALT) && !defined(MBEDTLS_ECP_INTERNAL_ALT)
-#error "MBEDTLS_ECP_ADD_MIXED_ALT defined, but not all prerequisites"
-#endif
-
-#if defined(MBEDTLS_ECP_DOUBLE_JAC_ALT) && !defined(MBEDTLS_ECP_INTERNAL_ALT)
-#error "MBEDTLS_ECP_DOUBLE_JAC_ALT defined, but not all prerequisites"
-#endif
-
-#if defined(MBEDTLS_ECP_NORMALIZE_JAC_MANY_ALT) && !defined(MBEDTLS_ECP_INTERNAL_ALT)
-#error "MBEDTLS_ECP_NORMALIZE_JAC_MANY_ALT defined, but not all prerequisites"
-#endif
-
-#if defined(MBEDTLS_ECP_NORMALIZE_JAC_ALT) && !defined(MBEDTLS_ECP_INTERNAL_ALT)
-#error "MBEDTLS_ECP_NORMALIZE_JAC_ALT defined, but not all prerequisites"
-#endif
-
-#if defined(MBEDTLS_ECP_DOUBLE_ADD_MXZ_ALT) && !defined(MBEDTLS_ECP_INTERNAL_ALT)
-#error "MBEDTLS_ECP_DOUBLE_ADD_MXZ_ALT defined, but not all prerequisites"
-#endif
-
-#if defined(MBEDTLS_ECP_RANDOMIZE_MXZ_ALT) && !defined(MBEDTLS_ECP_INTERNAL_ALT)
-#error "MBEDTLS_ECP_RANDOMIZE_MXZ_ALT defined, but not all prerequisites"
-#endif
-
-#if defined(MBEDTLS_ECP_NORMALIZE_MXZ_ALT) && !defined(MBEDTLS_ECP_INTERNAL_ALT)
-#error "MBEDTLS_ECP_NORMALIZE_MXZ_ALT defined, but not all prerequisites"
-#endif
-
-#if defined(MBEDTLS_ECP_NO_FALLBACK) && !defined(MBEDTLS_ECP_INTERNAL_ALT)
-#error "MBEDTLS_ECP_NO_FALLBACK defined, but no alternative implementation enabled"
-#endif
-
 #if defined(MBEDTLS_HKDF_C) && !defined(MBEDTLS_MD_C)
 #error "MBEDTLS_HKDF_C defined, but not all prerequisites"
 #endif
@@ -315,7 +271,7 @@
 
 #if defined(MBEDTLS_KEY_EXCHANGE_ECDH_ECDSA_ENABLED) &&                 \
     ( !defined(MBEDTLS_CAN_ECDH) ||                                       \
-      !defined(MBEDTLS_PK_CAN_ECDSA_SIGN) ||                                \
+      !defined(PSA_HAVE_ALG_ECDSA_SIGN) ||                                \
       !defined(MBEDTLS_X509_CRT_PARSE_C) )
 #error "MBEDTLS_KEY_EXCHANGE_ECDH_ECDSA_ENABLED defined, but not all prerequisites"
 #endif
@@ -349,15 +305,9 @@
 
 #if defined(MBEDTLS_KEY_EXCHANGE_ECDHE_ECDSA_ENABLED) &&                \
     ( !defined(MBEDTLS_CAN_ECDH) ||                                       \
-      !defined(MBEDTLS_PK_CAN_ECDSA_SIGN) ||                                \
+      !defined(PSA_HAVE_ALG_ECDSA_SIGN) ||                                \
       !defined(MBEDTLS_X509_CRT_PARSE_C) )
 #error "MBEDTLS_KEY_EXCHANGE_ECDHE_ECDSA_ENABLED defined, but not all prerequisites"
-#endif
-
-#if defined(MBEDTLS_KEY_EXCHANGE_RSA_PSK_ENABLED) &&                   \
-    ( !defined(MBEDTLS_RSA_C) || !defined(MBEDTLS_X509_CRT_PARSE_C) || \
-      !defined(MBEDTLS_PKCS1_V15) )
-#error "MBEDTLS_KEY_EXCHANGE_RSA_PSK_ENABLED defined, but not all prerequisites"
 #endif
 
 #if defined(MBEDTLS_KEY_EXCHANGE_RSA_ENABLED) &&                       \
@@ -383,30 +333,30 @@
 
 /* Use of EC J-PAKE in TLS requires SHA-256. */
 #if defined(MBEDTLS_KEY_EXCHANGE_ECJPAKE_ENABLED) &&                    \
-    !defined(MBEDTLS_MD_CAN_SHA256)
+    !defined(PSA_WANT_ALG_SHA_256)
 #error "MBEDTLS_KEY_EXCHANGE_ECJPAKE_ENABLED defined, but not all prerequisites"
 #endif
 
 #if defined(MBEDTLS_KEY_EXCHANGE_WITH_CERT_ENABLED) &&        \
     !defined(MBEDTLS_SSL_KEEP_PEER_CERTIFICATE) &&            \
-    !defined(MBEDTLS_MD_CAN_SHA256) &&                        \
-    !defined(MBEDTLS_MD_CAN_SHA512) &&                        \
-    !defined(MBEDTLS_MD_CAN_SHA1)
+    !defined(PSA_WANT_ALG_SHA_256) &&                        \
+    !defined(PSA_WANT_ALG_SHA_512) &&                        \
+    !defined(PSA_WANT_ALG_SHA_1)
 #error "!MBEDTLS_SSL_KEEP_PEER_CERTIFICATE requires SHA-512, SHA-256 or SHA-1".
 #endif
 
 #if defined(MBEDTLS_MD_C) && \
-    !defined(MBEDTLS_MD_CAN_MD5) && \
-    !defined(MBEDTLS_MD_CAN_RIPEMD160) && \
-    !defined(MBEDTLS_MD_CAN_SHA1) && \
-    !defined(MBEDTLS_MD_CAN_SHA224) && \
-    !defined(MBEDTLS_MD_CAN_SHA256) && \
-    !defined(MBEDTLS_MD_CAN_SHA384) && \
-    !defined(MBEDTLS_MD_CAN_SHA512) && \
-    !defined(MBEDTLS_MD_CAN_SHA3_224) && \
-    !defined(MBEDTLS_MD_CAN_SHA3_256) && \
-    !defined(MBEDTLS_MD_CAN_SHA3_384) && \
-    !defined(MBEDTLS_MD_CAN_SHA3_512)
+    !defined(PSA_WANT_ALG_MD5) && \
+    !defined(PSA_WANT_ALG_RIPEMD160) && \
+    !defined(PSA_WANT_ALG_SHA_1) && \
+    !defined(PSA_WANT_ALG_SHA_224) && \
+    !defined(PSA_WANT_ALG_SHA_256) && \
+    !defined(PSA_WANT_ALG_SHA_384) && \
+    !defined(PSA_WANT_ALG_SHA_512) && \
+    !defined(PSA_WANT_ALG_SHA3_224) && \
+    !defined(PSA_WANT_ALG_SHA3_256) && \
+    !defined(PSA_WANT_ALG_SHA3_384) && \
+    !defined(PSA_WANT_ALG_SHA3_512)
 #error "MBEDTLS_MD_C defined, but no hash algorithm"
 #endif
 
@@ -442,7 +392,7 @@
 #endif
 
 #if defined(MBEDTLS_PK_C) && \
-    !defined(MBEDTLS_RSA_C) && !defined(MBEDTLS_PK_HAVE_ECC_KEYS)
+    !defined(MBEDTLS_RSA_C) && !defined(PSA_WANT_KEY_TYPE_ECC_PUBLIC_KEY)
 #error "MBEDTLS_PK_C defined, but not all prerequisites"
 #endif
 
@@ -738,6 +688,11 @@
 #error "MBEDTLS_PSA_INJECT_ENTROPY is not compatible with MBEDTLS_PSA_CRYPTO_EXTERNAL_RNG"
 #endif
 
+#if defined(MBEDTLS_PSA_KEY_STORE_DYNAMIC) &&           \
+    defined(MBEDTLS_PSA_STATIC_KEY_SLOTS)
+#error "MBEDTLS_PSA_KEY_STORE_DYNAMIC and MBEDTLS_PSA_STATIC_KEY_SLOTS cannot be defined simultaneously"
+#endif
+
 #if defined(MBEDTLS_PSA_ITS_FILE_C) && \
     !defined(MBEDTLS_FS_IO)
 #error "MBEDTLS_PSA_ITS_FILE_C defined, but not all prerequisites"
@@ -768,9 +723,6 @@
 #if !defined(MBEDTLS_SHA512_C)
 #error "MBEDTLS_SHA512_USE_A64_CRYPTO_* defined without MBEDTLS_SHA512_C"
 #endif
-#if defined(MBEDTLS_SHA512_ALT) || defined(MBEDTLS_SHA512_PROCESS_ALT)
-#error "MBEDTLS_SHA512_*ALT can't be used with MBEDTLS_SHA512_USE_A64_CRYPTO_*"
-#endif
 
 #endif /* MBEDTLS_SHA512_USE_A64_CRYPTO_IF_PRESENT || MBEDTLS_SHA512_USE_A64_CRYPTO_ONLY */
 
@@ -787,9 +739,6 @@
     defined(MBEDTLS_SHA256_USE_ARMV8_A_CRYPTO_ONLY)
 #if !defined(MBEDTLS_SHA256_C)
 #error "MBEDTLS_SHA256_USE_ARMV8_A_CRYPTO_* defined without MBEDTLS_SHA256_C"
-#endif
-#if defined(MBEDTLS_SHA256_ALT) || defined(MBEDTLS_SHA256_PROCESS_ALT)
-#error "MBEDTLS_SHA256_*ALT can't be used with MBEDTLS_SHA256_USE_ARMV8_A_CRYPTO_*"
 #endif
 
 #endif
@@ -815,7 +764,7 @@
 #if defined(MBEDTLS_SSL_TLS1_3_KEY_EXCHANGE_MODE_EPHEMERAL_ENABLED)
 #if !( (defined(PSA_WANT_ALG_ECDH) || defined(PSA_WANT_ALG_FFDH)) && \
        defined(MBEDTLS_X509_CRT_PARSE_C) && \
-       ( defined(MBEDTLS_PK_CAN_ECDSA_SIGN) || defined(MBEDTLS_PKCS1_V21) ) )
+       ( defined(PSA_HAVE_ALG_ECDSA_SIGN) || defined(MBEDTLS_PKCS1_V21) ) )
 #error "MBEDTLS_SSL_TLS1_3_KEY_EXCHANGE_MODE_EPHEMERAL_ENABLED defined, but not all prerequisites"
 #endif
 #endif
@@ -842,7 +791,6 @@
       defined(MBEDTLS_KEY_EXCHANGE_ECDH_ECDSA_ENABLED) ||                   \
       defined(MBEDTLS_KEY_EXCHANGE_PSK_ENABLED) ||                          \
       defined(MBEDTLS_KEY_EXCHANGE_DHE_PSK_ENABLED) ||                      \
-      defined(MBEDTLS_KEY_EXCHANGE_RSA_PSK_ENABLED) ||                      \
       defined(MBEDTLS_KEY_EXCHANGE_ECDHE_PSK_ENABLED) ||                    \
       defined(MBEDTLS_KEY_EXCHANGE_ECJPAKE_ENABLED) )
 #error "One or more versions of the TLS protocol are enabled " \
@@ -882,18 +830,10 @@
 #endif
 
 /* TLS 1.2 and 1.3 require SHA-256 or SHA-384 (running handshake hash) */
-#if defined(MBEDTLS_SSL_TLS_C)
-#if defined(MBEDTLS_USE_PSA_CRYPTO)
-#if !(defined(PSA_WANT_ALG_SHA_256) || defined(PSA_WANT_ALG_SHA_384))
+#if defined(MBEDTLS_SSL_TLS_C) && \
+    !(defined(PSA_WANT_ALG_SHA_256) || defined(PSA_WANT_ALG_SHA_384))
 #error "MBEDTLS_SSL_TLS_C defined, but not all prerequisites"
 #endif
-#else /* MBEDTLS_USE_PSA_CRYPTO */
-#if !defined(MBEDTLS_MD_C) || \
-    !(defined(MBEDTLS_MD_CAN_SHA256) || defined(MBEDTLS_MD_CAN_SHA384))
-#error "MBEDTLS_SSL_TLS_C defined, but not all prerequisites"
-#endif
-#endif /* MBEDTLS_USE_PSA_CRYPTO */
-#endif /* MBEDTLS_SSL_TLS_C */
 
 #if defined(MBEDTLS_SSL_SRV_C) && !defined(MBEDTLS_SSL_TLS_C)
 #error "MBEDTLS_SSL_SRV_C defined, but not all prerequisites"
@@ -969,8 +909,8 @@
 #endif
 
 #if defined(MBEDTLS_SSL_TICKET_C) && \
-    !( defined(MBEDTLS_SSL_HAVE_CCM) || defined(MBEDTLS_SSL_HAVE_GCM) || \
-    defined(MBEDTLS_SSL_HAVE_CHACHAPOLY) )
+    !( defined(PSA_WANT_ALG_CCM) || defined(PSA_WANT_ALG_GCM) || \
+    defined(PSA_WANT_ALG_CHACHA20_POLY1305) )
 #error "MBEDTLS_SSL_TICKET_C defined, but not all prerequisites"
 #endif
 
@@ -1070,8 +1010,8 @@
 #endif
 
 #if defined(MBEDTLS_SSL_CONTEXT_SERIALIZATION) && \
-    !( defined(MBEDTLS_SSL_HAVE_CCM) || defined(MBEDTLS_SSL_HAVE_GCM) || \
-    defined(MBEDTLS_SSL_HAVE_CHACHAPOLY) )
+    !( defined(PSA_WANT_ALG_CCM) || defined(PSA_WANT_ALG_GCM) || \
+    defined(PSA_WANT_ALG_CHACHA20_POLY1305) )
 #error "MBEDTLS_SSL_CONTEXT_SERIALIZATION defined, but not all prerequisites"
 #endif
 

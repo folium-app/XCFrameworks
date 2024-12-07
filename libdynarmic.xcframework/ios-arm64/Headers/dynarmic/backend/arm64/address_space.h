@@ -43,8 +43,6 @@ public:
 
     void ClearCache();
 
-    void DumpDisassembly() const;
-
 protected:
     virtual EmitConfig GetEmitConfig() = 0;
     virtual void RegisterNewBasicBlock(const IR::Block& block, const EmittedBlockInfo& block_info) = 0;

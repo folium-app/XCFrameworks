@@ -4,7 +4,7 @@
  *
  * This is an internal header. Do not include it directly.
  *
- * Automatically enable certain dependencies. Generally, MBEDLTS_xxx
+ * Automatically enable certain dependencies. Generally, MBEDTLS_xxx
  * configurations need to be explicitly enabled by the user: enabling
  * MBEDTLS_xxx_A but not MBEDTLS_xxx_B when A requires B results in a
  * compilation error. However, we do automatically enable certain options
@@ -67,7 +67,6 @@
 #undef MBEDTLS_KEY_EXCHANGE_ECDHE_ECDSA_ENABLED
 #undef MBEDTLS_KEY_EXCHANGE_PSK_ENABLED
 #undef MBEDTLS_KEY_EXCHANGE_DHE_PSK_ENABLED
-#undef MBEDTLS_KEY_EXCHANGE_RSA_PSK_ENABLED
 #undef MBEDTLS_KEY_EXCHANGE_ECDHE_PSK_ENABLED
 #undef MBEDTLS_KEY_EXCHANGE_ECDH_RSA_ENABLED
 #undef MBEDTLS_KEY_EXCHANGE_ECDH_ECDSA_ENABLED

@@ -52,8 +52,10 @@ typedef unsigned long ulong;
 // Helper macro for aligning pointer up to next 16-byte boundary
 #define SOUNDTOUCH_ALIGN_POINTER_16(x)      ( ( (ulongptr)(x) + 15 ) & ~(ulongptr)15 )
 
+
 #include <CoreFoundation/CoreFoundation.h>
 #include <objc/objc.h>
+
 
 namespace soundtouch
 {
